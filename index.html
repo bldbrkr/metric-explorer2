@@ -121,7 +121,7 @@
     .chart-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
       padding: 24px 28px 20px; flex: 1; display: flex; flex-direction: column;
-      min-height: 0; position: relative; overflow: hidden;
+      min-height: 0; position: relative;
     }
     .chart-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
     .chart-title-block .chart-model {
@@ -509,6 +509,7 @@ function renderChart() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { bottom: 10 } },
       interaction: { mode: 'index', intersect: false },
       animation: { duration: 350, easing: 'easeInOutQuart' },
       plugins: {
