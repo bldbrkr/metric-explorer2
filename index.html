@@ -412,7 +412,7 @@ function getAvailableData() {
 
 function populateCategories() {
   const avail = getAvailableData();
-  const cats = Object.keys(avail).sort();
+  const cats = Object.keys(avail);
   [$('selCat1'), $('selCat2')].forEach(sel => { setOptions(sel, cats, '— Category —'); sel.disabled = false; });
   [$('selMetric1'), $('selMetric2')].forEach(sel => { setOptions(sel, [], '— Select Category First —'); sel.disabled = true; });
 }
@@ -421,7 +421,7 @@ function onCatChange(idx) {
   const cat = idx === 1 ? state.cat1 : state.cat2;
   const metSel = idx === 1 ? $('selMetric1') : $('selMetric2');
   if (!cat) { setOptions(metSel, [], '— Select Category First —'); metSel.disabled = true; return; }
-  setOptions(metSel, Object.keys(getAvailableData()[cat] || {}).sort(), '— Select Metric —');
+  setOptions(metSel, Object.keys(getAvailableData()[cat] || {}), '— Select Metric —');
   metSel.disabled = false;
 }
 
