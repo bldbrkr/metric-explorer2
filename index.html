@@ -120,7 +120,7 @@
 
     .chart-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-      padding: 24px 28px 20px; flex: 1; display: flex; flex-direction: column;
+      padding: 24px 28px 36px; flex: 1; display: flex; flex-direction: column;
       min-height: 0; position: relative;
     }
     .chart-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
@@ -136,7 +136,8 @@
     .legend-pip.m1 { background: var(--accent1); box-shadow: 0 0 6px var(--accent1); }
     .legend-pip.m2 { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
 
-    canvas { flex: 1; }
+    .canvas-wrap { flex: 1; min-height: 0; position: relative; }
+    .canvas-wrap canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
 
     .empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -250,7 +251,7 @@
         <div class="empty-icon">▦</div>
         <p>Select two metrics to render the chart</p>
       </div>
-      <canvas id="chart" style="display:none"></canvas>
+      <div class="canvas-wrap" id="canvasWrap" style="display:none"><canvas id="chart"></canvas></div>
     </div>
     </div>
   </main>
@@ -451,7 +452,7 @@ function tryRender() { if (state.metric1 && state.metric2) renderChart(); else d
 
 function destroyChart() {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-  $('chart').style.display = 'none'; $('emptyState').style.display = 'flex';
+  $('canvasWrap').style.display = 'none'; $('emptyState').style.display = 'flex';
   $('chartModel').textContent = '—';
   $('chartTitle').textContent = 'Awaiting selection';
   $('chartSub').textContent = 'Configure the controls to render a chart';
@@ -481,7 +482,7 @@ function renderChart() {
   $('leg1').textContent = state.metric1; $('leg2').textContent = state.metric2;
 
   if (chartInstance) chartInstance.destroy();
-  $('emptyState').style.display = 'none'; $('chart').style.display = 'block';
+  $('emptyState').style.display = 'none'; $('canvasWrap').style.display = 'block';
 
   chartInstance = new Chart($('chart').getContext('2d'), {
     type: 'line',
@@ -494,7 +495,6 @@ function renderChart() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { bottom: 10 } },
       interaction: { mode: 'index', intersect: false },
       animation: { duration: 350, easing: 'easeInOutQuart' },
       plugins: {
