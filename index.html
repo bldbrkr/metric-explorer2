@@ -346,13 +346,19 @@ function renderTimestamps() {
   const list = $('tsList');
   if (!state.model) { list.innerHTML = '<div style="font-size:12px;color:var(--ink-dim);padding:4px 0">Select a model first</div>'; return; }
   list.innerHTML = '';
-  Object.keys(state.data[state.model]).sort().forEach(ts => {
+  const timestamps = Object.keys(state.data[state.model]).sort();
+  timestamps.forEach(ts => {
     const div = document.createElement('div');
     div.className = 'ts-item'; div.dataset.ts = ts;
     div.innerHTML = `<div class="ts-check">✓</div><div class="ts-label">${ts}</div>`;
     div.addEventListener('click', () => toggleTimestamp(ts, div));
     list.appendChild(div);
   });
+  // Auto-select if PIT mode and only one timestamp available
+  if (state.view === 'pit' && timestamps.length === 1) {
+    const onlyItem = list.querySelector('.ts-item');
+    toggleTimestamp(timestamps[0], onlyItem);
+  }
 }
 
 function toggleTimestamp(ts, el) {
@@ -412,7 +418,9 @@ function getAvailableData() {
 
 function populateCategories() {
   const avail = getAvailableData();
-  const cats = Object.keys(avail);
+  // Preserve spreadsheet order by reading keys from the source data directly
+  const tsData = state.data[state.model]?.[state.timestamps[0]]?.[state.worksheet]?.[state.granularity];
+  const cats = tsData ? Object.keys(tsData).filter(c => avail[c]) : Object.keys(avail);
   [$('selCat1'), $('selCat2')].forEach(sel => { setOptions(sel, cats, '— Category —'); sel.disabled = false; });
   [$('selMetric1'), $('selMetric2')].forEach(sel => { setOptions(sel, [], '— Select Category First —'); sel.disabled = true; });
 }
