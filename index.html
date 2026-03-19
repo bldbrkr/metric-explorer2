@@ -149,14 +149,6 @@
     }
     .empty-state p { font-size: 13px; color: var(--ink-dim); }
 
-    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; }
-    .stat.s1 { border-top: 2px solid var(--accent1); }
-    .stat.s2 { border-top: 2px solid var(--accent2); }
-    .stat-label { font-family: var(--mono); font-size: 10px; color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .stat-value { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
-    .stat-meta  { font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
-
     .loading-bar {
       position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--accent1), var(--accent2));
@@ -260,12 +252,6 @@
       </div>
       <canvas id="chart" style="display:none"></canvas>
     </div>
-
-    <div class="stats-bar" id="statsBar" style="display:none">
-      <div class="stat s1"><div class="stat-label" id="s1label">—</div><div class="stat-value" id="s1latest">—</div><div class="stat-meta" id="s1period">—</div></div>
-      <div class="stat s1"><div class="stat-label">Min / Max</div><div class="stat-value" id="s1minmax">—</div><div class="stat-meta">range</div></div>
-      <div class="stat s2"><div class="stat-label" id="s2label">—</div><div class="stat-value" id="s2latest">—</div><div class="stat-meta" id="s2period">—</div></div>
-      <div class="stat s2"><div class="stat-label">Min / Max</div><div class="stat-value" id="s2minmax">—</div><div class="stat-meta">range</div></div>
     </div>
   </main>
 </div>
@@ -466,7 +452,6 @@ function tryRender() { if (state.metric1 && state.metric2) renderChart(); else d
 function destroyChart() {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
   $('chart').style.display = 'none'; $('emptyState').style.display = 'flex';
-  $('chartLegend').style.display = 'none'; $('statsBar').style.display = 'none';
   $('chartModel').textContent = '—';
   $('chartTitle').textContent = 'Awaiting selection';
   $('chartSub').textContent = 'Configure the controls to render a chart';
@@ -534,15 +519,6 @@ function renderChart() {
   const last1 = d1.map((v,i) => v !== null ? i : -1).filter(i => i >= 0).pop();
   const last2 = d2.map((v,i) => v !== null ? i : -1).filter(i => i >= 0).pop();
 
-  $('s1label').textContent = state.metric1;
-  $('s1latest').textContent = last1 !== undefined ? fmt(d1[last1]) : '—';
-  $('s1period').textContent = last1 !== undefined ? labels[last1] : '';
-  $('s1minmax').textContent = nonNull1.length ? `${fmt(Math.min(...nonNull1))} / ${fmt(Math.max(...nonNull1))}` : '—';
-  $('s2label').textContent = state.metric2;
-  $('s2latest').textContent = last2 !== undefined ? fmt(d2[last2]) : '—';
-  $('s2period').textContent = last2 !== undefined ? labels[last2] : '';
-  $('s2minmax').textContent = nonNull2.length ? `${fmt(Math.min(...nonNull2))} / ${fmt(Math.max(...nonNull2))}` : '—';
-  $('statsBar').style.display = 'grid';
 }
 </script>
 </body>
