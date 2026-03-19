@@ -317,6 +317,7 @@ $('selModel').addEventListener('change', function () {
   setOptions($('selWorksheet'), [...wsSet].sort(), '— Select Worksheet —');
   $('selWorksheet').disabled = false;
   renderTimestamps();
+  maybeAutoSelectTimestamp();
 });
 
 // ── Worksheet ──────────────────────────────────────────────
@@ -325,6 +326,7 @@ $('selWorksheet').addEventListener('change', function () {
   state.granularity = null;
   state.cat1 = state.metric1 = state.cat2 = state.metric2 = null;
   resetFrom('gran');
+  maybeAutoSelectTimestamp();
   if (state.worksheet && state.timestamps.length > 0) enableGranularity();
 });
 
@@ -354,10 +356,14 @@ function renderTimestamps() {
     div.addEventListener('click', () => toggleTimestamp(ts, div));
     list.appendChild(div);
   });
-  // Auto-select if PIT mode and only one timestamp available
-  if (state.view === 'pit' && timestamps.length === 1) {
-    const onlyItem = list.querySelector('.ts-item');
-    toggleTimestamp(timestamps[0], onlyItem);
+}
+
+function maybeAutoSelectTimestamp() {
+  if (!state.model) return;
+  const timestamps = Object.keys(state.data[state.model]).sort();
+  if (state.view === 'pit' && timestamps.length === 1 && state.timestamps.length === 0) {
+    const onlyItem = $('tsList').querySelector('.ts-item');
+    if (onlyItem) toggleTimestamp(timestamps[0], onlyItem);
   }
 }
 
