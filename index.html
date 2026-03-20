@@ -314,7 +314,10 @@ $('selWorksheet').addEventListener('change', function () {
   state.cat1 = state.metric1 = state.cat2 = state.metric2 = null;
   resetFrom('gran');
   maybeAutoSelectTimestamp();
-  if (state.worksheet && state.timestamps.length > 0) enableGranularity();
+  if (state.worksheet && state.timestamps.length > 0) {
+    enableGranularity();
+    maybeAutoSelectGranularity();
+  }
 });
 
 // ── View ───────────────────────────────────────────────────
@@ -374,12 +377,33 @@ function toggleTimestamp(ts, el) {
       state.timestamps.push(ts); el.classList.add('selected');
     }
   }
-  if (state.timestamps.length > 0 && state.worksheet) enableGranularity();
-  else resetFrom('gran');
+  if (state.timestamps.length > 0 && state.worksheet) {
+    enableGranularity();
+    maybeAutoSelectGranularity();
+  } else resetFrom('gran');
 }
 
 // ── Granularity ────────────────────────────────────────────
 function enableGranularity() { document.querySelectorAll('.toggle-btn').forEach(b => b.disabled = false); }
+
+function maybeAutoSelectGranularity() {
+  if (!state.model || !state.worksheet || !state.timestamps.length) return;
+  // Detect if only one granularity exists for this worksheet across selected timestamps
+  const availableGrans = new Set();
+  state.timestamps.forEach(ts => {
+    const wsData = state.data[state.model]?.[ts]?.[state.worksheet];
+    if (wsData) Object.keys(wsData).forEach(g => availableGrans.add(g));
+  });
+  if (availableGrans.size === 1) {
+    const gran = [...availableGrans][0];
+    document.querySelectorAll('.toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.gran === gran);
+    });
+    state.granularity = gran;
+    resetFrom('metrics');
+    populateCategories();
+  }
+}
 
 document.querySelectorAll('.toggle-btn').forEach(btn => {
   btn.addEventListener('click', function () {
